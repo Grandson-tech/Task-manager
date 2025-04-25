@@ -2,6 +2,10 @@
 
 A modern task management application with integrated Pomodoro timer functionality. Built with HTML, CSS, and JavaScript, using Firebase for backend services.
 
+## Live Demo
+
+Visit the live application at: [Task Manager Demo](https://grandson-tech.github.io/Task-manager/)
+
 ## Features
 
 - Task Management
@@ -51,6 +55,10 @@ A modern task management application with integrated Pomodoro timer functionalit
    - Add your Firebase configuration to `js/firebase-config.js`
 
 3. Open `index.html` in your browser or use a local server
+
+## Deployment
+
+The application is automatically deployed to GitHub Pages when changes are pushed to the `gh-pages` branch. The deployment process is handled by GitHub Actions.
 
 ## Contributing
 
