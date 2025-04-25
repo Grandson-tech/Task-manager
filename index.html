@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="light-mode">
+    <!-- Auth Container (Login/Register) -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <h1>Task Manager</h1>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Name</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Container (Main App) -->
+    <div id="app-container" class="app-container" style="display: none;">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Task Manager</h1>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <span id="user-name">Loading...</span>
+                        <button id="logout-btn" class="btn-icon" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                    <div class="import-export-actions">
+                        <button id="export-tasks" class="btn-icon" title="Export Tasks">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                        <label for="import-tasks" class="btn-icon" title="Import Tasks">
+                            <i class="fas fa-file-import"></i>
+                        </label>
+                        <input type="file" id="import-tasks" accept=".json" style="display: none;">
+                    </div>
+                    <button id="theme-toggle" class="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="tasks">
+                <i class="fas fa-tasks"></i>
+                Tasks
+            </button>
+            <button class="nav-btn" data-section="teams">
+                <i class="fas fa-users"></i>
+                Teams
+            </button>
+            <button class="nav-btn" data-section="analytics">
+                <i class="fas fa-chart-bar"></i>
+                Analytics
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tasks Section -->
+            <section id="tasks-section" class="content-section active">
+                <!-- Dashboard Section -->
+                <section class="dashboard">
+                    <div class="date-display">
+                        <h2 id="current-date">Loading...</h2>
+                    </div>
+                    <div class="task-summary">
+                        <div class="summary-card">
+                            <h3>Today's Tasks</h3>
+                            <p id="today-count">0</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Upcoming</h3>
+                            <p id="upcoming-count">0</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Completed</h3>
+                            <p id="completed-count">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Task Input Form -->
+                <section class="task-input-section">
+                    <form id="task-form" class="task-form">
+                        <div class="form-group">
+                            <input type="text" id="task-title" placeholder="Task title" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="task-description" placeholder="Task description"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="date" id="task-due-date" required>
+                            </div>
+                            <div class="form-group">
+                                <select id="task-priority" required>
+                                    <option value="low">Low Priority</option>
+                                    <option value="medium">Medium Priority</option>
+                                    <option value="high">High Priority</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="time" id="task-reminder" placeholder="Set reminder time">
+                        </div>
+                        <div class="form-group">
+                            <div class="subtasks-input">
+                                <input type="text" id="subtask-input" placeholder="Add a subtask">
+                                <button type="button" id="add-subtask" class="btn btn-secondary">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="subtasks-list" class="subtasks-list"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
+                    </form>
+                </section>
+
+                <!-- Task Lists -->
+                <section class="task-lists">
+                    <div class="task-section">
+                        <h2>Today's Tasks</h2>
+                        <div id="today-tasks" class="task-list"></div>
+                    </div>
+                    <div class="task-section">
+                        <h2>Upcoming Tasks</h2>
+                        <div id="upcoming-tasks" class="task-list"></div>
+                    </div>
+                    <div class="task-section">
+                        <h2>Completed Tasks</h2>
+                        <div id="completed-tasks" class="task-list"></div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Teams Section -->
+            <section id="teams-section" class="content-section">
+                <div class="teams-header">
+                    <h2>My Teams</h2>
+                    <button id="create-team-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Team
+                    </button>
+                </div>
+
+                <!-- Teams List -->
+                <div class="teams-grid">
+                    <!-- Team cards will be added here dynamically -->
+                </div>
+
+                <!-- Create Team Modal -->
+                <div id="create-team-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Create New Team</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <form id="create-team-form">
+                            <div class="form-group">
+                                <label for="team-name">Team Name</label>
+                                <input type="text" id="team-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="team-description">Description</label>
+                                <textarea id="team-description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Add Members</label>
+                                <div class="member-input">
+                                    <input type="email" id="member-email" placeholder="Enter member's email">
+                                    <button type="button" id="add-member-btn" class="btn btn-secondary">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div id="members-list" class="members-list"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Team</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Team Details Modal -->
+                <div id="team-details-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="team-details-name">Team Name</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="team-details-content">
+                            <div class="team-info">
+                                <p id="team-details-description"></p>
+                                <div class="team-members">
+                                    <h4>Team Members</h4>
+                                    <div id="team-members-list"></div>
+                                </div>
+                            </div>
+                            <div class="team-tasks">
+                                <h4>Team Tasks</h4>
+                                <div id="team-tasks-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics-section" class="content-section">
+                <div class="analytics-grid">
+                    <!-- Time Tracking Analytics -->
+                    <div class="analytics-card">
+                        <h2>Time Tracking Analytics</h2>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <h3>Total Pomodoros</h3>
+                                <p id="total-pomodoros">0</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>Total Time</h3>
+                                <p id="total-time">0 minutes</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>Avg. Session</h3>
+                                <p id="avg-session">0 minutes</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>Most Focused Day</h3>
+                                <p id="most-focused-day">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Completions Chart -->
+                    <div class="analytics-card">
+                        <h2>Daily Pomodoro Completions</h2>
+                        <div class="chart-container">
+                            <canvas id="daily-completions-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Task Distribution Chart -->
+                    <div class="analytics-card">
+                        <h2>Task Distribution</h2>
+                        <div class="chart-container">
+                            <canvas id="task-distribution-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Time Spent Chart -->
+                    <div class="analytics-card">
+                        <h2>Time Spent per Task</h2>
+                        <div class="chart-container">
+                            <canvas id="time-spent-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pomodoro Timer Widget -->
+            <div id="pomodoro-widget" class="pomodoro-widget">
+                <div class="pomodoro-header">
+                    <h3><i class="fas fa-clock"></i> Pomodoro Timer</h3>
+                    <div class="pomodoro-controls">
+                        <button id="minimizePomodoro" class="btn-icon" title="Minimize">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button id="closePomodoro" class="btn-icon" title="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="pomodoro-content">
+                    <div class="timer-display">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-background" cx="50" cy="50" r="45"/>
+                            <circle id="progressCircle" class="progress-bar" cx="50" cy="50" r="45"/>
+                        </svg>
+                        <div id="timerDisplay" class="timer-text">25:00</div>
+                        <div class="timer-mode">
+                          
+                    </div>
+                    <div class="timer-controls">
+                        <button id="startPomodoro" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button id="pausePomodoro" class="btn btn-primary" style="display: none;">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button id="resetPomodoro" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    <div class="timer-modes">
+                        <button id="workMode" class="btn btn-mode active">
+                            <i class="fas fa-briefcase"></i> Work
+                        </button>
+                        <button id="shortBreakMode" class="btn btn-mode">
+                            <i class="fas fa-coffee"></i> Short Break
+                        </button>
+                        <button id="longBreakMode" class="btn btn-mode">
+                            <i class="fas fa-couch"></i> Long Break
+                        </button>
+                    </div>
+                    <div class="custom-duration">
+                        <label for="customDuration">Custom Duration (minutes):</label>
+                        <input type="number" id="customDuration" min="1" max="60" value="25">
+                    </div>
+                    <div class="current-task">
+                        <h4><i class="fas fa-tasks"></i> Current Task:</h4>
+                        <p id="currentTaskName">No task selected</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Task Template -->
+    <template id="task-template">
+        <div class="task-card">
+            <div class="task-header">
+                <h3 class="task-title"></h3>
+                <div class="task-actions">
+                    <button class="btn-icon edit-task">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete-task">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-icon complete-task">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="task-description"></p>
+            <div class="task-footer">
+                <span class="task-due-date"></span>
+                <span class="task-priority"></span>
+            </div>
+            <div class="subtasks-container">
+                <div class="subtasks-header">
+                    <button class="btn-icon toggle-subtasks">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <span class="subtasks-progress"></span>
+                </div>
+                <div class="subtasks-list"></div>
+                <div class="subtasks-input">
+                    <input type="text" class="subtask-input" placeholder="Add a subtask">
+                    <button class="btn-icon add-subtask">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Subtask Template -->
+    <template id="subtask-template">
+        <div class="subtask-item">
+            <label class="subtask-checkbox">
+                <input type="checkbox" class="subtask-complete">
+                <span class="checkmark"></span>
+            </label>
+            <span class="subtask-title"></span>
+            <button class="btn-icon delete-subtask">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- Team Template -->
+    <template id="team-template">
+        <div class="team-card">
+            <div class="team-header">
+                <h3 class="team-name"></h3>
+                <div class="team-actions">
+                    <button class="btn-icon view-team">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon edit-team">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete-team">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="team-description"></p>
+            <div class="team-footer">
+                <div class="team-members-preview">
+                    <i class="fas fa-users"></i>
+                    <span class="member-count">0 members</span>
+                </div>
+                <div class="team-tasks-preview">
+                    <i class="fas fa-tasks"></i>
+                    <span class="task-count">0 tasks</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Team Member Template -->
+    <template id="team-member-template">
+        <div class="team-member">
+            <div class="member-info">
+                <span class="member-name"></span>
+                <span class="member-email"></span>
+            </div>
+            <div class="member-role">
+                <select class="role-select">
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <button class="btn-icon remove-member">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/taskManager.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/importExport.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/teams.js"></script>
+    <script src="js/pomodoro.js"></script>
+    <script src="js/timeAnalytics.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
